@@ -72,8 +72,8 @@ export function BankSelectorModalTrigger({
         <div
           className={clsx(
             "fixed inset-0 z-50 flex items-center justify-center p-4",
-            "transition-opacity duration-200",
-            isOpen ? "bg-black/40 opacity-100" : "bg-black/40 opacity-0"
+            "transition-opacity duration-200 backdrop-blur-sm supports-[backdrop-filter]:bg-background/60 bg-background/80",
+            isOpen ? "opacity-100" : "opacity-0"
           )}
           onClick={closeAndReturnFocus}
         >
@@ -83,7 +83,8 @@ export function BankSelectorModalTrigger({
             aria-modal="true"
             aria-labelledby="bank-selector-title"
             className={clsx(
-              "w-full max-w-3xl rounded-2xl border bg-white p-4 shadow-xl sm:p-6",
+              "w-full max-w-3xl rounded-2xl border border-border/60 bg-card/95 text-card-foreground p-4 shadow-2xl sm:p-6",
+              "backdrop-blur supports-[backdrop-filter]:bg-card/80",
               "transition-all duration-200 ease-out",
               isOpen
                 ? "opacity-100 scale-100 translate-y-0"
@@ -159,7 +160,7 @@ function BankList({
                   type="button"
                   className={clsx(
                     "flex w-full items-center justify-between rounded-lg border px-4 py-3 hover:bg-accent",
-                    "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-white",
+                    "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background",
                     selected && "border-primary bg-primary/5"
                   )}
                   onClick={() => onSelect(b.id)}
@@ -170,7 +171,7 @@ function BankList({
                       alt={b.name}
                       width={40}
                       height={40}
-                      className="h-10 w-10 rounded bg-white object-contain"
+                      className="h-10 w-10 rounded bg-background object-contain"
                     />
                     <span
                       className={clsx(
