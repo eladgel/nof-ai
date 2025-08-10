@@ -63,7 +63,7 @@ export function BankSelectorModalContent({
           <X className="h-4 w-4" aria-hidden="true" />
         </button>
       </div>
-      <div className="grid max-h-[70vh] grid-cols-1 gap-4 overflow-auto divide-y divide-border sm:grid-cols-2 sm:divide-y-0 sm:divide-x">
+      <div className="grid max-h-[70vh] grid-cols-1 overflow-auto sm:grid-cols-2 sm:divide-x sm:divide-border">
         <BankSelectorList
           title="בנקים ישראליים"
           banks={banks.filter((b) => isIsraeliBank(b.id))}

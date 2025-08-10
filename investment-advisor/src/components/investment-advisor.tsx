@@ -68,60 +68,76 @@ export default function InvestmentAdvisor() {
           <p className="text-muted-foreground">אין נתוני בנקים להצגה עדיין.</p>
         ) : (
           <div className="space-y-6">
-            {/* Israeli Banks */}
-            <div>
-              <div className="mb-4 text-sm font-medium text-muted-foreground">
-                בנקים ישראליים
-              </div>
-              <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {recommendations
-                  .filter(({ bank }) => isIsraeliBank(bank.id))
-                  .map(({ bank, total, breakdown }) => (
-                    <li
-                      key={bank.id}
-                      className="rounded-xl border p-4 shadow-sm bg-card hover:shadow-md transition-shadow"
-                    >
-                      <BankCard
-                        bank={bank}
-                        total={total}
-                        breakdown={breakdown}
-                      />
-                    </li>
-                  ))}
-              </ul>
-            </div>
-            
-            {/* Separator */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border"></div>
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-4 text-muted-foreground font-medium">
-                  בתי השקעות וחברי בורסה
-                </span>
-              </div>
-            </div>
-            
-            {/* Investment Houses */}
-            <div>
-              <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {recommendations
-                  .filter(({ bank }) => !isIsraeliBank(bank.id))
-                  .map(({ bank, total, breakdown }) => (
-                    <li
-                      key={bank.id}
-                      className="rounded-xl border p-4 shadow-sm bg-card hover:shadow-md transition-shadow"
-                    >
-                      <BankCard
-                        bank={bank}
-                        total={total}
-                        breakdown={breakdown}
-                      />
-                    </li>
-                  ))}
-              </ul>
-            </div>
+            {(() => {
+              const israeliBanks = recommendations.filter(({ bank }) => isIsraeliBank(bank.id));
+              const investmentHouses = recommendations.filter(({ bank }) => !isIsraeliBank(bank.id));
+              
+              return (
+                <>
+                  {/* Israeli Banks */}
+                  {israeliBanks.length > 0 && (
+                    <div>
+                      <div className="mb-4 text-sm font-medium text-muted-foreground">
+                        בנקים ישראליים
+                      </div>
+                      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        {israeliBanks.map(({ bank, total, breakdown }) => (
+                          <li
+                            key={bank.id}
+                            className="rounded-xl border p-4 shadow-sm bg-card hover:shadow-md transition-shadow"
+                          >
+                            <BankCard
+                              bank={bank}
+                              total={total}
+                              breakdown={breakdown}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {/* Separator - only show if both sections have items */}
+                  {israeliBanks.length > 0 && investmentHouses.length > 0 && (
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-border"></div>
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-background px-4 text-muted-foreground font-medium">
+                          בתי השקעות וחברי בורסה
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Investment Houses */}
+                  {investmentHouses.length > 0 && (
+                    <div>
+                      {israeliBanks.length === 0 && (
+                        <div className="mb-4 text-sm font-medium text-muted-foreground">
+                          בתי השקעות וחברי בורסה
+                        </div>
+                      )}
+                      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        {investmentHouses.map(({ bank, total, breakdown }) => (
+                          <li
+                            key={bank.id}
+                            className="rounded-xl border p-4 shadow-sm bg-card hover:shadow-md transition-shadow"
+                          >
+                            <BankCard
+                              bank={bank}
+                              total={total}
+                              breakdown={breakdown}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
           </div>
         )}
       </section>

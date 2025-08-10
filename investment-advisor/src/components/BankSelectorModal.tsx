@@ -79,5 +79,4 @@ export function BankSelectorModalTrigger({
   );
 }
 
-
 BankSelectorModalTrigger.displayName = "BankSelectorModalTrigger";
