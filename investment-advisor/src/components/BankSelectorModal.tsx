@@ -103,8 +103,10 @@ export function BankSelectorModalTrigger({
                   "rounded-full p-2",
                   "text-foreground",
                   "bg-foreground/10 hover:bg-foreground/20",
-                  "border-4 border-foreground/30", // thicker border
-                  "backdrop-blur transition-colors shadow-sm",
+                  "border-4 border-foreground/30",
+                  "backdrop-blur shadow-sm",
+                  "transition-all duration-200 ease-out",
+                  "hover:scale-110 hover:shadow-md hover:border-foreground/50",
                   "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
                 )}
                 onClick={closeAndReturnFocus}
@@ -178,13 +180,13 @@ function BankList({
                   )}
                   onClick={() => onSelect(b.id)}
                 >
-                  <span className="h-14 w-14 sm:h-17 sm:w-17 rounded-md bg-white ring-1 ring-border/50 flex items-center justify-center">
+                  <span className="h-20 w-20 sm:h-20 sm:w-20 rounded-md bg-white ring-1 ring-border/50 flex items-center justify-center">
                     <Image
                       src={getLogoSrc(b.id)}
                       alt={b.name}
-                      width={48}
-                      height={48}
-                      className="h-12 w-12 object-contain"
+                      width={56}
+                      height={56}
+                      className="h-14 w-14 object-contain"
                     />
                   </span>
                   <span
