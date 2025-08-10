@@ -166,13 +166,15 @@ function BankList({
                   onClick={() => onSelect(b.id)}
                 >
                   <span className="flex items-center gap-3">
-                    <Image
-                      src={getLogoSrc(b.id)}
-                      alt={b.name}
-                      width={40}
-                      height={40}
-                      className="h-10 w-10 rounded bg-background object-contain"
-                    />
+                    <span className="h-10 w-10 rounded-md bg-white ring-1 ring-border/50 flex items-center justify-center">
+                      <Image
+                        src={getLogoSrc(b.id)}
+                        alt={b.name}
+                        width={32}
+                        height={32}
+                        className="h-8 w-8 object-contain"
+                      />
+                    </span>
                     <span
                       className={clsx(
                         "truncate",
