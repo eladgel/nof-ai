@@ -67,12 +67,13 @@ export default function InvestmentAdvisor() {
         {recommendations.length === 0 ? (
           <p className="text-muted-foreground">אין נתוני בנקים להצגה עדיין.</p>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="space-y-6">
+            {/* Israeli Banks */}
             <div>
-              <div className="mb-2 text-sm font-medium text-muted-foreground">
+              <div className="mb-4 text-sm font-medium text-muted-foreground">
                 בנקים ישראליים
               </div>
-              <ul className="grid gap-3 sm:grid-cols-2">
+              <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {recommendations
                   .filter(({ bank }) => isIsraeliBank(bank.id))
                   .map(({ bank, total, breakdown }) => (
@@ -89,11 +90,22 @@ export default function InvestmentAdvisor() {
                   ))}
               </ul>
             </div>
-            <div>
-              <div className="mb-2 text-sm font-medium text-muted-foreground">
-                בתי השקעות / חברי בורסה
+            
+            {/* Separator */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border"></div>
               </div>
-              <ul className="grid gap-3 sm:grid-cols-2">
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-4 text-muted-foreground font-medium">
+                  בתי השקעות וחברי בורסה
+                </span>
+              </div>
+            </div>
+            
+            {/* Investment Houses */}
+            <div>
+              <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {recommendations
                   .filter(({ bank }) => !isIsraeliBank(bank.id))
                   .map(({ bank, total, breakdown }) => (
