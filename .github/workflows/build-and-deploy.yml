@@ -1,0 +1,109 @@
+name: Build & Deploy Extension
+on:
+  release:
+    # will run when a new release is created
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout tagged source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          fetch-depth: 0
+          token: ${{ secrets.GH_PAT }} # Need PAT for pushing changes
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      - run: npm ci
+
+      - name: Update versions and commit changes
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          # Remove 'v' prefix if present in tag
+          VERSION=${GITHUB_REF#refs/tags/}
+          VERSION=${VERSION#v}
+
+          # Validate version format (x.y.z)
+          if ! [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: Release tag must be in format x.y.z (e.g., v1.0.2)"
+            exit 1
+          fi
+
+          # Update manifest.json version
+          node -e "
+            const fs = require('fs');
+            const manifest = JSON.parse(fs.readFileSync('./manifest.json', 'utf8'));
+            manifest.version = '$VERSION';
+            fs.writeFileSync('./manifest.json', JSON.stringify(manifest, null, 2) + '\n');
+          "
+
+          # Update package.json version
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
+            pkg.version = '$VERSION';
+            fs.writeFileSync('./package.json', JSON.stringify(pkg, null, 2) + '\n');
+          "
+
+          # Configure git
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'github-actions@github.com'
+
+          # Create a new branch for the version update
+          BRANCH_NAME="chore/update-version-${VERSION}"
+          git checkout -b "${BRANCH_NAME}"
+
+          # Commit and push changes
+          git add manifest.json package.json
+          git commit -m "chore: update version to ${VERSION} [skip ci]"
+          git push origin "${BRANCH_NAME}"
+
+          # Create a pull request
+          gh pr create \
+            --title "chore: update version to ${VERSION}" \
+            --body "This PR updates the version to ${VERSION} as part of the release process." \
+            --base main \
+            --head "${BRANCH_NAME}"
+
+      - run: pnpm run build
+
+      - name: Zip build output
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          cd build
+          zip -r "../Finito-${TAG}.zip" .
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Finito-${{ github.event.release.tag_name }}
+          path: Finito-${{ github.event.release.tag_name }}.zip
+
+      - name: Attach ZIP to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.GH_PAT }}
+          files: Finito-${{ github.event.release.tag_name }}.zip
+
+      - name: Publish to Chrome Web Store
+        env:
+          EXTENSION_ID: ${{ secrets.EXTENSION_ID }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+        run: |
+          npm install -g chrome-webstore-upload-cli
+          chrome-webstore-upload upload \
+            --source "Finito-${{ github.event.release.tag_name }}.zip" \
+            --extension-id "$EXTENSION_ID" \
+            --client-id "$CLIENT_ID" \
+            --client-secret "$CLIENT_SECRET" \
+            --refresh-token "$REFRESH_TOKEN" \
+            --publish

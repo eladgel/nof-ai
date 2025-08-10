@@ -1,0 +1,14 @@
+{
+  "package-name": "nof-ai",
+  "bump-minor-pre-major": true,
+  "include-v-in-tag": true,
+  "manifest": "src/manifest.json",
+  "release-type": "chrome-extension",
+  "commit-filtering": "lenient",
+  "changelog-sections": [
+    {"type": "feat", "section": "Features", "hidden": false},
+    {"type": "fix", "section": "Bug Fixes", "hidden": false},
+    {"type": "chore", "section": "Miscellaneous Chores", "hidden": false, "release": "patch"},
+    {"type": "docs", "section": "Documentation", "hidden": false, "release": "patch"}
+  ]
+}

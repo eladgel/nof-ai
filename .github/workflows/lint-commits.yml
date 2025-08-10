@@ -1,0 +1,28 @@
+name: Lint Commits
+
+on:
+  pull_request:      # catches commits before merge
+  push:              # catches direct pushes if you ever allow them
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  commitlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0      # fetch full history so commitlint sees every commit
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      - run: npm ci --ignore-scripts
+
+      - name: Lint commit messages
+        run: npx commitlint --from=${{ github.event.pull_request.base.sha || github.sha }} --to=${{ github.event.pull_request.head.sha || github.sha }}
