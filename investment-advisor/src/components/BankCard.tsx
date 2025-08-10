@@ -32,7 +32,6 @@ export function BankCard({
           />
           <div className="font-medium">{bank.name}</div>
         </div>
-        <div className="text-sm text-muted-foreground">{bank.id}</div>
       </div>
       <div className="mt-3 text-sm">סה&quot;כ עמלות שנתיות</div>
       <div className="text-2xl font-bold">₪ {total.toLocaleString()}</div>

@@ -3,8 +3,6 @@
 import { useMemo } from "react";
 import { BankCommission } from "@/types";
 import {
-  calculateManagementFee,
-  calculateTradingFee,
   resolveManagementRates,
 } from "@/lib/fee-calculator";
 
@@ -25,37 +23,22 @@ export function useBankBreakdown(
       } as const;
     }
 
-    const israeliFee = calculateTradingFee(bank, israeliAmount, "israeli");
-    const foreignFee = calculateTradingFee(bank, foreignAmount, "foreign");
-    const managementFee = calculateManagementFee(
-      bank,
-      israeliAmount,
-      foreignAmount
-    );
-
-    const totalBase = Math.max(1, (israeliAmount || 0) + (foreignAmount || 0));
-    const { israeliAnnualRatePct, foreignAnnualRatePct } = resolveManagementRates(
-      bank,
-      israeliAmount,
-      foreignAmount
-    );
-    const managementRate =
-      totalBase > 0
-        ? ((israeliAmount || 0) * israeliAnnualRatePct +
-            (foreignAmount || 0) * foreignAnnualRatePct) /
-          totalBase
-        : 0;
-
-    const israeliRate = israeliAmount > 0 ? (israeliFee / israeliAmount) * 100 : 0;
-    const foreignRate = foreignAmount > 0 ? (foreignFee / foreignAmount) * 100 : 0;
+    // Calculate management fees for Israeli and foreign securities separately
+    // Each should use its own tier based on its individual amount
+    const israeliRates = resolveManagementRates(bank, israeliAmount, 0);
+    const foreignRates = resolveManagementRates(bank, 0, foreignAmount);
+    
+    const israeliFee = israeliAmount > 0 ? Math.round(((israeliAmount * israeliRates.israeliAnnualRatePct) / 100) * 1000) / 1000 : 0;
+    const foreignFee = foreignAmount > 0 ? Math.round(((foreignAmount * foreignRates.foreignAnnualRatePct) / 100) * 1000) / 1000 : 0;
+   
+    const israeliRate = israeliRates.israeliAnnualRatePct;
+    const foreignRate = foreignRates.foreignAnnualRatePct;
 
     return {
       israeliFee,
       israeliRate,
       foreignFee,
-      foreignRate,
-      managementFee,
-      managementRate,
+      foreignRate
     } as const;
   }, [bank, israeliAmount, foreignAmount]);
 }

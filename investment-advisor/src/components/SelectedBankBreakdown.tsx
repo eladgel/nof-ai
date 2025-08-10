@@ -15,18 +15,13 @@ export function SelectedBankBreakdown({
     israeliFee,
     israeliRate,
     foreignFee,
-    foreignRate,
-    managementFee,
-    managementRate,
+    foreignRate
   } = useBankBreakdown(bank, israeliAmount, foreignAmount);
 
   return (
     <div className="rounded-lg border p-4 bg-card/50">
       <div className="flex items-center justify-between">
         <div className="font-medium">{bank.name}</div>
-        <div className="text-sm text-muted-foreground">
-          תצוגה לפי סכומים נוכחיים
-        </div>
       </div>
       <div className="mt-3 grid gap-2 sm:grid-cols-3">
         <div className="space-y-1">
@@ -39,12 +34,6 @@ export function SelectedBankBreakdown({
           <div className="text-sm text-muted-foreground">דמי ניהול - ני&quot;ע זרים</div>
           <div className="text-lg font-semibold">
             ₪ {foreignFee.toLocaleString()} ({foreignRate.toFixed(3)}%)
-          </div>
-        </div>
-        <div className="space-y-1">
-          <div className="text-sm text-muted-foreground">דמי ניהול</div>
-          <div className="text-lg font-semibold">
-            ₪ {managementFee.toLocaleString()} ({managementRate.toFixed(3)}%)
           </div>
         </div>
       </div>
