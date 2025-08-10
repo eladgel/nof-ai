@@ -45,7 +45,7 @@ export function BankCard({
           </span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-muted-foreground">מסחר חו&quot;ל</span>
+          <span className="text-muted-foreground">דמי ניהול - ני&quot;ע זרים</span>
           <span>
             ₪ {breakdown.foreignFee.toLocaleString()} (
             {breakdown.foreignRate.toFixed(3)}%)

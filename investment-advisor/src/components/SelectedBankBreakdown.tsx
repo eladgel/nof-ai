@@ -36,7 +36,7 @@ export function SelectedBankBreakdown({
           </div>
         </div>
         <div className="space-y-1">
-          <div className="text-sm text-muted-foreground">מסחר חו&quot;ל</div>
+          <div className="text-sm text-muted-foreground">דמי ניהול - ני&quot;ע זרים</div>
           <div className="text-lg font-semibold">
             ₪ {foreignFee.toLocaleString()} ({foreignRate.toFixed(3)}%)
           </div>
