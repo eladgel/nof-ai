@@ -1,0 +1,13 @@
+{
+  "vitest.enable": true,
+  "vitest.commandLine": "npm test",
+  "testing.automaticallyOpenPeekView": "never",
+  "testing.openTesting": "openOnTestStart",
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "files.associations": {
+    "*.test.ts": "typescript"
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  }
+}
