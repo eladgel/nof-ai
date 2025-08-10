@@ -5,6 +5,10 @@ import {
   resolveManagementRates,
 } from "@/lib/fee-calculator";
 import type { BankCommission } from "@/types";
+import { parseBankData } from "@/lib/bank-data";
+import type { BankJsonData } from "@/types";
+import fs from "node:fs";
+import path from "node:path";
 
 const mockBank: BankCommission = {
   id: "1234",
@@ -68,7 +72,6 @@ describe("fee-calculator", () => {
 
     const amountIL = 120_000;
     const amountFR = 80_000;
-    const total = amountIL + amountFR; // 200k → tier [100k, 500k]
     const rates = resolveManagementRates(tieredBank, amountIL, amountFR);
 
     expect(rates.israeliAnnualRatePct).toBeCloseTo(0.4, 6);
@@ -77,6 +80,64 @@ describe("fee-calculator", () => {
     const fee = calculateManagementFee(tieredBank, amountIL, amountFR);
     // 120k * 0.4% = 480 ; 80k * 0.6% = 480 ; total 960
     expect(fee).toBeCloseTo(960, 4);
+  });
+
+  describe("bank 1107 management tiers (from JSON)", () => {
+    const loadBank1107 = (): BankCommission => {
+      const jsonPath = path.join(process.cwd(), "data", "banks", "1107.json");
+      const raw = fs.readFileSync(jsonPath, "utf-8");
+      const json = JSON.parse(raw) as BankJsonData;
+      return parseBankData(json, "1107");
+    };
+
+    it("resolves rates for total <= 25,000 ₪", () => {
+      const bank = loadBank1107();
+      // Use boundary value exactly 25,000 to ensure correct bucket selection
+      const rates = resolveManagementRates(bank, 25_000, 0);
+      expect(rates.israeliAnnualRatePct).toBeCloseTo(0.17, 6);
+      expect(rates.foreignAnnualRatePct).toBeCloseTo(0.19, 6);
+
+      const fee = calculateManagementFee(bank, 25_000, 0);
+      // 25,000 * 0.17% = 42.5
+      expect(fee).toBeCloseTo(42.5, 3);
+    });
+
+    it("resolves rates for 25,000 < total <= 50,000 ₪", () => {
+      const bank = loadBank1107();
+      const rates = resolveManagementRates(bank, 30_000, 0);
+      // According to 1107.json: IL 0.3100%, Foreign 0.5000%
+      expect(rates.israeliAnnualRatePct).toBeCloseTo(0.31, 6);
+      expect(rates.foreignAnnualRatePct).toBeCloseTo(0.5, 6);
+
+      const fee = calculateManagementFee(bank, 30_000, 0);
+      // 30,000 * 0.31% = 93
+      expect(fee).toBeCloseTo(93, 3);
+    });
+
+    it("resolves rates for all remaining tiers using representative totals", () => {
+      const bank = loadBank1107();
+      const cases: Array<{ total: number; il: number; fr: number; note?: string }> = [
+        { total: 12_000, il: 0.17, fr: 0.19, note: "עד 25" },
+        { total: 30_000, il: 0.31, fr: 0.5, note: "מעל 25 ועד 50" },
+        { total: 60_000, il: 0.31, fr: 0.47, note: "מעל 50 ועד 75" },
+        { total: 90_000, il: 0.31, fr: 0.42, note: "מעל 75 ועד 100" },
+        { total: 150_000, il: 0.29, fr: 0.39, note: "מעל 100 ועד 200" },
+        { total: 300_000, il: 0.27, fr: 0.33, note: "מעל 200 ועד 400" },
+        { total: 600_000, il: 0.23, fr: 0.26, note: "מעל 400 ועד 700" },
+        { total: 900_000, il: 0.2, fr: 0.22, note: "מעל 700 ועד 1,000" },
+        { total: 1_200_000, il: 0.08, fr: 0.1, note: "מעל 1,000" },
+      ];
+
+      cases.forEach(({ total, il, fr }) => {
+        const rates = resolveManagementRates(bank, total, 0);
+        expect(rates.israeliAnnualRatePct).toBeCloseTo(il, 6);
+        expect(rates.foreignAnnualRatePct).toBeCloseTo(fr, 6);
+
+        // Also validate fee for Israeli-only to match exact rate
+        const fee = calculateManagementFee(bank, total, 0);
+        expect(fee).toBeCloseTo((total * il) / 100, 3);
+      });
+    });
   });
 });
 
