@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import clsx from "clsx";
-import { Check } from "lucide-react";
+import { X } from "lucide-react";
 import { BankCommission } from "@/types";
 import { getLogoSrc, isIsraeliBank } from "@/lib/bank-utils";
 import { useDisclosure } from "@/hooks/useDisclosure";
@@ -64,7 +64,7 @@ export function BankSelectorModalTrigger({
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         onClick={open}
-        className="w-full rounded-lg border bg-background/50 px-3 py-2 text-left shadow-sm hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
+        className="w-full rounded-lg border bg-background/50 px-3 py-2 text-right shadow-sm hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
       >
         {current ? current.name : "בחר"}
       </button>
@@ -99,11 +99,18 @@ export function BankSelectorModalTrigger({
               <button
                 ref={closeBtnRef}
                 type="button"
-                className="rounded-md px-2 py-1 text-sm text-muted-foreground hover:bg-accent"
+                className={clsx(
+                  "rounded-full p-2",
+                  "text-foreground",
+                  "bg-foreground/10 hover:bg-foreground/20",
+                  "border-4 border-foreground/30", // thicker border
+                  "backdrop-blur transition-colors shadow-sm",
+                  "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+                )}
                 onClick={closeAndReturnFocus}
                 aria-label="סגור מודאל"
               >
-                סגור
+                <X className="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
             <div className="grid max-h-[70vh] grid-cols-1 gap-4 overflow-auto divide-y divide-border sm:grid-cols-2 sm:divide-y-0 sm:divide-x">
@@ -149,7 +156,7 @@ function BankList({
       <div className="mb-2 text-sm font-medium text-muted-foreground">
         {title}
       </div>
-      <ul className="space-y-2">
+      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         {banks
           .sort((a, b) => a.name.localeCompare(b.name))
           .map((b) => {
@@ -159,37 +166,34 @@ function BankList({
                 <button
                   type="button"
                   className={clsx(
-                    "flex w-full items-center justify-between rounded-lg border px-4 py-3 hover:bg-accent",
+                    "group relative w-full rounded-xl border p-4 sm:p-5",
+                    "flex aspect-square flex-col items-center justify-center gap-2",
+                    "transition-all duration-300 ease-out",
+                    "hover:bg-accent/60 hover:scale-105 hover:shadow-lg",
                     "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background",
-                    selected && "border-primary bg-primary/5"
+                    "items-center justify-center text-center",
+                    selected 
+                      ? "border-2 border-primary bg-primary/10 shadow-md ring-2 ring-primary/20" 
+                      : "border-border/50 hover:border-primary/40"
                   )}
                   onClick={() => onSelect(b.id)}
                 >
-                  <span className="flex items-center gap-3">
-                    <span className="h-10 w-10 rounded-md bg-white ring-1 ring-border/50 flex items-center justify-center">
-                      <Image
-                        src={getLogoSrc(b.id)}
-                        alt={b.name}
-                        width={32}
-                        height={32}
-                        className="h-8 w-8 object-contain"
-                      />
-                    </span>
-                    <span
-                      className={clsx(
-                        "truncate",
-                        selected
-                          ? "font-semibold text-base"
-                          : "font-medium text-base"
-                      )}
-                    >
-                      {b.name}
-                    </span>
+                  <span className="h-14 w-14 sm:h-17 sm:w-17 rounded-md bg-white ring-1 ring-border/50 flex items-center justify-center">
+                    <Image
+                      src={getLogoSrc(b.id)}
+                      alt={b.name}
+                      width={48}
+                      height={48}
+                      className="h-12 w-12 object-contain"
+                    />
                   </span>
-                  <span className="flex items-center gap-2 text-muted-foreground">
-                    {selected ? (
-                      <Check className="h-5 w-5 text-primary" />
-                    ) : null}
+                  <span
+                    className={clsx(
+                      "mt-1 w-full truncate text-center flex justify-center items-center", // ensure centering
+                      selected ? "font-semibold" : "font-medium"
+                    )}
+                  >
+                    {b.name}
                   </span>
                 </button>
               </li>
