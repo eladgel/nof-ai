@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { Check } from "lucide-react";
 import { BankCommission } from "@/types";
 import { getLogoSrc, isIsraeliBank } from "@/lib/bank-utils";
-import { useState } from "react";
+import { useDisclosure } from "@/hooks/useDisclosure";
 
 export function BankSelectorModalTrigger({
   banks,
@@ -15,22 +15,22 @@ export function BankSelectorModalTrigger({
   currentBankId: string;
   onSelect: (id: string) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const { isOpen, open, close } = useDisclosure(false);
   const current = banks.find((b) => b.id === currentBankId) || null;
   return (
     <div className="space-y-2">
       <label className="block text-sm font-medium">בחר בנק נוכחי</label>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={open}
         className="w-full rounded-lg border bg-background/50 px-3 py-2 text-left shadow-sm hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
       >
         {current ? current.name : "בחר"}
       </button>
-      {open ? (
+      {isOpen ? (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-          onClick={() => setOpen(false)}
+          onClick={close}
         >
           <div
             className="w-full max-w-3xl rounded-2xl border bg-white p-4 shadow-xl sm:p-6"
@@ -40,7 +40,7 @@ export function BankSelectorModalTrigger({
               <div className="text-lg font-semibold">בחר בנק / בית השקעות</div>
               <button
                 className="rounded-md px-2 py-1 text-sm text-muted-foreground hover:bg-accent"
-                onClick={() => setOpen(false)}
+                onClick={close}
               >
                 סגור
               </button>
@@ -52,7 +52,7 @@ export function BankSelectorModalTrigger({
                 currentBankId={currentBankId}
                 onSelect={(id) => {
                   onSelect(id);
-                  setOpen(false);
+                  close();
                 }}
               />
               <BankList
@@ -61,7 +61,7 @@ export function BankSelectorModalTrigger({
                 currentBankId={currentBankId}
                 onSelect={(id) => {
                   onSelect(id);
-                  setOpen(false);
+                  close();
                 }}
               />
             </div>

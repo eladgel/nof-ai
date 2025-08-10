@@ -1,10 +1,6 @@
 "use client";
 import { BankCommission } from "@/types";
-import {
-  calculateManagementFee,
-  calculateTradingFee,
-  resolveManagementRates,
-} from "@/lib/fee-calculator";
+import { useBankBreakdown } from "@/hooks/useBankBreakdown";
 
 export function SelectedBankBreakdown({
   bank,
@@ -15,30 +11,14 @@ export function SelectedBankBreakdown({
   israeliAmount: number;
   foreignAmount: number;
 }) {
-  const israeliFee = calculateTradingFee(bank, israeliAmount, "israeli");
-  const foreignFee = calculateTradingFee(bank, foreignAmount, "foreign");
-  const managementFee = calculateManagementFee(
-    bank,
-    israeliAmount,
-    foreignAmount
-  );
-  const totalBase = Math.max(1, (israeliAmount || 0) + (foreignAmount || 0));
-
-  const israeliRate =
-    israeliAmount > 0 ? (israeliFee / israeliAmount) * 100 : 0;
-  const foreignRate =
-    foreignAmount > 0 ? (foreignFee / foreignAmount) * 100 : 0;
-  const { israeliAnnualRatePct, foreignAnnualRatePct } = resolveManagementRates(
-    bank,
-    israeliAmount,
-    foreignAmount
-  );
-  const managementRate =
-    totalBase > 0
-      ? ((israeliAmount || 0) * israeliAnnualRatePct +
-          (foreignAmount || 0) * foreignAnnualRatePct) /
-        totalBase
-      : 0;
+  const {
+    israeliFee,
+    israeliRate,
+    foreignFee,
+    foreignRate,
+    managementFee,
+    managementRate,
+  } = useBankBreakdown(bank, israeliAmount, foreignAmount);
 
   return (
     <div className="rounded-lg border p-4 bg-card/50">
