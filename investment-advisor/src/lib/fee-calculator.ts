@@ -1,4 +1,4 @@
-import { BankCommission } from "@/types";
+import { BankCommission, ManagementTier } from "@/types";
 
 export function calculateTradingFee(
   bank: BankCommission,
@@ -27,6 +27,15 @@ export function calculateManagementFee(
   israeliAmount: number,
   foreignAmount: number
 ): number {
+  // Prefer tiered logic if available
+  if (bank.managementTiers && bank.managementTiers.length > 0) {
+    const total = Math.max(0, (israeliAmount || 0) + (foreignAmount || 0));
+    const tier = findManagementTier(bank.managementTiers, total);
+    const israeliFee = ((israeliAmount || 0) * tier.israeliAnnualRatePct) / 100;
+    const foreignFee = ((foreignAmount || 0) * tier.foreignAnnualRatePct) / 100;
+    return israeliFee + foreignFee;
+  }
+
   const israeliFee = typeof bank.managementFeeIsraeli === "number"
     ? bank.managementFeeIsraeli > 10
       ? bank.managementFeeIsraeli * 12
@@ -40,6 +49,40 @@ export function calculateManagementFee(
     : 0;
 
   return israeliFee + foreignFee;
+}
+
+export function resolveManagementRates(
+  bank: BankCommission,
+  israeliAmount: number,
+  foreignAmount: number
+): { israeliAnnualRatePct: number; foreignAnnualRatePct: number } {
+  if (bank.managementTiers && bank.managementTiers.length > 0) {
+    const total = Math.max(0, (israeliAmount || 0) + (foreignAmount || 0));
+    const tier = findManagementTier(bank.managementTiers, total);
+    return {
+      israeliAnnualRatePct: tier.israeliAnnualRatePct,
+      foreignAnnualRatePct: tier.foreignAnnualRatePct,
+    };
+  }
+  // Fallback to quarterly rates * 4 if only flat rates exist (<=10 interpreted as % per quarter)
+  const israeliAnnual =
+    typeof bank.managementFeeIsraeli === "number" && bank.managementFeeIsraeli <= 10
+      ? bank.managementFeeIsraeli * 4
+      : 0;
+  const foreignAnnual =
+    typeof bank.managementFeeForeign === "number" && bank.managementFeeForeign <= 10
+      ? bank.managementFeeForeign * 4
+      : 0;
+  return { israeliAnnualRatePct: israeliAnnual, foreignAnnualRatePct: foreignAnnual };
+}
+
+function findManagementTier(tiers: ManagementTier[], totalAmount: number): ManagementTier {
+  const inRange = tiers.find((t) => {
+    const minOk = totalAmount >= t.minAmount;
+    const maxOk = t.maxAmount == null ? true : totalAmount <= t.maxAmount;
+    return minOk && maxOk;
+  });
+  return inRange || tiers[tiers.length - 1];
 }
 
 export function calculateTotalFee(

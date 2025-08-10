@@ -82,3 +82,21 @@ body {
     transform: translateY(0);
   }
 }
+
+/* Improve native select and number inputs appearance */
+select {
+  background-image: none;
+}
+
+/* Remove spinners in number inputs */
+/* Chrome, Safari, Edge, Opera */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}

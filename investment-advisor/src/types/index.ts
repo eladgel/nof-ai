@@ -10,6 +10,7 @@ export interface BankCommission {
   foreignStocksMax: number;
   managementFeeIsraeli: number;
   managementFeeForeign: number;
+  managementTiers?: ManagementTier[];
   exceptional?: boolean;
   exceptionalMessage?: string;
 }
@@ -50,6 +51,21 @@ export interface BankJsonData {
     TableRow: CommissionTableRow[];
     TableHeader: string[];
   };
+  CommisionAverage?: {
+    DateFrom: string;
+    DateTo: string;
+    Comment: string | null;
+    TableValue: string[][]; // rows of values as strings
+    TableHeader: string[];
+    TableTooltipInfoHeader: string[];
+  };
+}
+
+export interface ManagementTier {
+  minAmount: number; // inclusive, in ₪
+  maxAmount: number | null; // inclusive upper bound; null means Infinity
+  israeliAnnualRatePct: number; // percent number, e.g. 0.17 = 0.17%
+  foreignAnnualRatePct: number; // percent number, e.g. 0.19 = 0.19%
 }
 
 
