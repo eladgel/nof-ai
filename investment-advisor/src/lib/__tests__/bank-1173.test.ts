@@ -31,15 +31,15 @@ describe("bank 1173 (בנק מרכנתיל דיסקונט)", () => {
   it("parses trading commission rates correctly", () => {
     const bank = loadBank1173();
     
-    // Israeli stocks: 0.4000% rate, ₪25.00 min, ₪7,150.00 max (but parser gets 150 due to comma handling)
+    // Israeli stocks: 0.4000% rate, ₪25.00 min, ₪7,150.00 max
     expect(bank.israeliStocksRate).toBe(0.4);
     expect(bank.israeliStocksMin).toBe(25);
-    expect(bank.israeliStocksMax).toBe(150); // Parser extracts first number before comma: "7" from "7,150.00"
+    expect(bank.israeliStocksMax).toBe(7150);
     
-    // Foreign stocks: 0.5900% rate, $23.50 min, $10,680.00 max (but parser gets 680 due to comma handling)  
+    // Foreign stocks: 0.5900% rate, $23.50 min, $10,680.00 max
     expect(bank.foreignStocksRate).toBe(0.59);
     expect(bank.foreignStocksMin).toBe(23.5);
-    expect(bank.foreignStocksMax).toBe(680); // Parser extracts first number before comma: "10" from "10,680.00"
+    expect(bank.foreignStocksMax).toBe(10680);
   });
 
   it("parses management fees correctly", () => {
@@ -80,8 +80,8 @@ describe("bank 1173 (בנק מרכנתיל דיסקונט)", () => {
     // Medium amount: 10,000 ₪ * 0.4% = 40 ₪ (within bounds)
     expect(calculateTradingFee(bank, 10000, "israeli")).toBe(40);
     
-    // Large amount: 2,000,000 ₪ * 0.4% = 8,000 ₪, but max is 150 ₪ (due to parser limitation)
-    expect(calculateTradingFee(bank, 2000000, "israeli")).toBe(150);
+    // Large amount: 2,000,000 ₪ * 0.4% = 8,000 ₪, but max is 7,150 ₪
+    expect(calculateTradingFee(bank, 2000000, "israeli")).toBe(7150);
   });
 
   it("calculates trading fees correctly for foreign stocks", () => {
@@ -93,8 +93,8 @@ describe("bank 1173 (בנק מרכנתיל דיסקונט)", () => {
     // Medium amount: 50,000 ₪ * 0.59% = 295 ₪ (within bounds)
     expect(calculateTradingFee(bank, 50000, "foreign")).toBeCloseTo(295, 1);
     
-    // Large amount: 10,000,000 ₪ * 0.59% = 59,000 ₪, but max is $680 * 3.8 = 2,584 ₪ (due to parser limitation)
-    expect(calculateTradingFee(bank, 10000000, "foreign")).toBeCloseTo(2584, 1);
+    // Large amount: 10,000,000 ₪ * 0.59% = 59,000 ₪, but max is $10,680 * 3.8 = 40,584 ₪
+    expect(calculateTradingFee(bank, 10000000, "foreign")).toBeCloseTo(40584, 1);
   });
 
   it("resolves management rates using tiers for different portfolio sizes", () => {

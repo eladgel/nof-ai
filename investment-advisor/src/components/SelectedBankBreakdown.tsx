@@ -30,7 +30,7 @@ export function SelectedBankBreakdown({
       </div>
       <div className="mt-3 grid gap-2 sm:grid-cols-3">
         <div className="space-y-1">
-          <div className="text-sm text-muted-foreground">מסחר ישראלי</div>
+          <div className="text-sm text-muted-foreground">דמי ניהול - ני"ע ישראלים</div>
           <div className="text-lg font-semibold">
             ₪ {israeliFee.toLocaleString()} ({israeliRate.toFixed(3)}%)
           </div>

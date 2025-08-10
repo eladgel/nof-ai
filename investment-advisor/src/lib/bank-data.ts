@@ -26,11 +26,11 @@ export function parseBankData(jsonData: BankJsonData, id: string): BankCommissio
 
   const parseCurrency = (str: string | null | undefined): number => {
     if (!str) return 0;
-    return parseFloat(
-      str.match(/(\d+\.?\d*)\s*₪/i)?.[1] ||
-        str.match(/(\d+\.?\d*)\s*\$/i)?.[1] ||
-        "0"
-    );
+    const nisMatch = str.match(/([\d,]+\.?\d*)\s*₪/i);
+    const dollarMatch = str.match(/([\d,]+\.?\d*)\s*\$/i);
+    const value = nisMatch?.[1] || dollarMatch?.[1] || "0";
+    // Remove commas and parse
+    return parseFloat(value.replace(/,/g, ""));
   };
 
   // Parse management tiers from CommisionAverage if available

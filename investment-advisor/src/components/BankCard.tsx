@@ -38,7 +38,7 @@ export function BankCard({
       <div className="text-2xl font-bold">₪ {total.toLocaleString()}</div>
       <div className="mt-3 space-y-1 text-sm">
         <div className="flex items-center justify-between">
-          <span className="text-muted-foreground">מסחר ישראלי</span>
+          <span className="text-muted-foreground">דמי ניהול - ני"ע ישראלים</span>
           <span>
             ₪ {breakdown.israeliFee.toLocaleString()} (
             {breakdown.israeliRate.toFixed(3)}%)
